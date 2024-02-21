@@ -1,5 +1,7 @@
 # Actix Web Template
 
+![gh_actions_rust](https://github.com/FrozenArcher/actix-template/actions/workflows/rust.yml/badge.svg)
+
 This project is a basic template for [`actix-web`](https://github.com/actix/actix-web),
 using [`sqlx`](https://github.com/launchbadge/sqlx) and [`postgresql`](https://www.postgresql.org/)
 
@@ -22,19 +24,19 @@ The template uses JSON as response:
 
 ```json
 {
-    success: true,
-    data: {
+    "success": true,
+    "data": {
         // some data
     }
 }
 ```
 
-### failure
+### Failure
 
 ```json
 {
-    success: false,
-    err: "some error"
+    "success": false,
+    "err": "some error"
 }
 ```
 
