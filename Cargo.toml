@@ -1,0 +1,17 @@
+[package]
+name = "actix-template"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "*"
+env_logger = "*"
+dotenvy = "*"
+actix-web = { version = "4" }
+actix-rt = { version = "2" }
+serde = { version = "1", features = ["derive"] }
+chrono = { version = "0.4.19", features = ["serde"] }
+derive_more = "*"
+sqlx = { version = "0.7", features = ["postgres", "runtime-tokio"] }
