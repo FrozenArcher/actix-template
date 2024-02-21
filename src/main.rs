@@ -3,6 +3,9 @@ mod db;
 mod misc;
 mod response;
 
+#[cfg(test)]
+mod tests;
+
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use config::AppConfig;

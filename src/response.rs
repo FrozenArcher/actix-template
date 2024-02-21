@@ -13,8 +13,8 @@ pub type AppResult<T> = actix_web::Result<web::Json<OkModel<T>>, AppError>;
 /// # Error JSON response model
 #[derive(Serialize)]
 pub struct ErrModel {
-    success: bool,
-    err: &'static str,
+    pub success: bool,
+    pub err: &'static str,
 }
 
 /// # Success JSON response model
@@ -23,8 +23,8 @@ pub struct OkModel<T>
 where
     T: Serialize,
 {
-    success: bool,
-    data: T,
+    pub success: bool,
+    pub data: T,
 }
 
 /// # App Errors
