@@ -45,11 +45,6 @@ pub async fn test_invalid() -> AppResult<()> {
 
 #[get("/db")]
 pub async fn test_db(data: web::Data<AppState>) -> AppResult<&'static str> {
-    let row: (i64,) = sqlx::query_as("SELECT $1")
-        .bind(150_i64)
-        .fetch_one(&data.db.pool)
-        .await?;
-
-    assert_eq!(row.0, 150);
-    AppResponse::Success("success").response()
+    data.db.test_db().await?;
+    AppResponse::Success("Test for db is success").response()
 }

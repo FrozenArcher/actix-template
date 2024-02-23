@@ -1,16 +1,18 @@
 use crate::config::AppConfig;
+use derive_more::{Display, Error};
 use log::info;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
 use std::io;
 
 #[derive(Clone)]
-pub struct AppDB {
-    pub pool: Pool<Postgres>,
+pub enum AppDB {
+    Postgres(Pool<Postgres>),
+    Mock,
 }
 
 impl AppDB {
-    pub async fn new(config: &AppConfig) -> io::Result<Self> {
+    pub async fn postgres(config: &AppConfig) -> io::Result<Self> {
         let db_url = format!(
             "postgres://{}:{}@{}/{}",
             config.db_user, config.db_password, config.db_host, config.db_database
@@ -26,10 +28,44 @@ impl AppDB {
                 "connected to database {} at {}",
                 config.db_database, config.db_host
             );
-            Ok(AppDB { pool })
+            Ok(Self::Postgres(pool))
         } else {
             let msg = format!("failed to connect to database, config {:?}", config);
             Err(io::Error::other(msg))
         }
+    }
+    pub fn mock() -> Self {
+        Self::Mock
+    }
+}
+
+impl AppDB {
+    pub async fn test_db(&self) -> DBResult<()> {
+        match self {
+            Self::Postgres(pool) => {
+                let row: (i64,) = sqlx::query_as("SELECT $1")
+                    .bind(150_i64)
+                    .fetch_one(pool)
+                    .await?;
+
+                assert_eq!(row.0, 150);
+                Ok(())
+            }
+            _ => Err(DBError::Unimplemented),
+        }
+    }
+}
+
+pub type DBResult<T> = std::result::Result<T, DBError>;
+
+#[derive(Debug, Error, Display)]
+pub enum DBError {
+    SqlxError(sqlx::Error),
+    Unimplemented,
+}
+
+impl From<sqlx::Error> for DBError {
+    fn from(err: sqlx::Error) -> Self {
+        Self::SqlxError(err)
     }
 }

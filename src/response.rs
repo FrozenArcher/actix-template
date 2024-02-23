@@ -7,6 +7,8 @@ use derive_more::{Display, Error};
 use log::warn;
 use serde::Serialize;
 
+use crate::db::DBError;
+
 /// Result type returned by handler functions.
 pub type AppResult<T> = actix_web::Result<web::Json<OkModel<T>>, AppError>;
 
@@ -59,6 +61,13 @@ impl error::ResponseError for AppError {
 
 impl From<sqlx::Error> for AppError {
     fn from(err: sqlx::Error) -> Self {
+        warn!("{}", err);
+        Self::InternalError
+    }
+}
+
+impl From<DBError> for AppError {
+    fn from(err: DBError) -> Self {
         warn!("{}", err);
         Self::InternalError
     }
