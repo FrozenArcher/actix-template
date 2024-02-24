@@ -53,7 +53,7 @@ impl error::ResponseError for AppError {
             }),
             Self::InternalError => resp.json(ErrModel {
                 success: false,
-                err: "502 internal server error",
+                err: "500 internal server error",
             }),
         }
     }
