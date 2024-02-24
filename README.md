@@ -27,7 +27,7 @@ The template uses JSON as response:
 {
     "success": true,
     "data": {
-        // some data
+        "foo": "bar"
     }
 }
 ```
@@ -55,6 +55,10 @@ And edit `.env` file:
 ```bash
 # Log level
 RUST_LOG=debug
+
+# To enable `Mock` data source:
+# MOCK=1
+MOCK=0
 
 # Service
 HOST="127.0.0.1"

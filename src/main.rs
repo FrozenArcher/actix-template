@@ -21,7 +21,13 @@ pub struct AppState {
 
 impl AppState {
     pub async fn new(config: &AppConfig) -> std::io::Result<AppState> {
-        let db = AppDB::postgres(&config).await?;
+        let db: AppDB;
+        if config.use_mock {
+            info!("using `Mock` data source");
+            db = AppDB::mock();
+        } else {
+            db = AppDB::postgres(config).await?;
+        }
         Ok(AppState { db })
     }
 }
