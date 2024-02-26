@@ -12,14 +12,14 @@ use crate::db::DBError;
 /// Result type returned by handler functions.
 pub type AppResult<T> = actix_web::Result<web::Json<OkModel<T>>, AppError>;
 
-/// # Error JSON response model
+/// Error response model
 #[derive(Serialize)]
 pub struct ErrModel {
     pub success: bool,
     pub err: &'static str,
 }
 
-/// # Success JSON response model
+/// Success response model
 #[derive(Serialize)]
 pub struct OkModel<T>
 where
@@ -29,7 +29,7 @@ where
     pub data: T,
 }
 
-/// # App Errors
+/// An `AppError` is an error response message
 #[derive(Debug, Display, Error, Serialize)]
 pub enum AppError {
     Invalid { err: &'static str },
@@ -73,43 +73,27 @@ impl From<DBError> for AppError {
     }
 }
 
-/// App response types
+/// Response of the app
 ///
-/// # Examples
-///
-/// ## Success
-///
-/// ```no_run
-///#[get("/ping")]
-///pub async fn ping() -> AppResult<PingResponse> {
-///    AppResponse::Success(PingResponse { msg: "pong" }).response()
-///}
-///```
-///
-/// ## Internal server error
-///
-///```no_run
-///#[get("/test/internal")]
-///pub async fn test_internal() -> AppResult<()> {
-///    AppResponse::InternalError.response()
-///}
-///```
-///
-/// ## Bad request
-///
-///```no_run
-///#[get("/test/invalid")]
-///pub async fn test_invalid() -> AppResult<()> {
-///    AppResponse::Invalid("test invalid").response()
-///}
-/// ```
+/// `T` is the data type of success response.
 #[derive(Serialize, Debug, Display)]
 pub enum AppResponse<T>
 where
     T: Serialize,
 {
+    /// Returns a 200 response with data.
     Success(T),
+    /// Returns a 400 response with error message.
     Invalid(&'static str),
+    /// Returns a 500 response.
+    ///
+    /// **NOTE**:
+    ///
+    /// The message with `InternalError` will not be sent to client.
+    ///
+    /// Instead, the message will be recorded in the log system.
+    ///
+    /// see: `AppError::error_response`
     InternalError(&'static str),
 }
 
@@ -117,6 +101,29 @@ impl<T> AppResponse<T>
 where
     T: Serialize,
 {
+    /// The actual response result.
+    /// # Example
+    /// - Success
+    /// ```rust
+    /// #[get("/ping")]
+    /// pub async fn ping() -> AppResult<PingResponse> {
+    ///     AppResponse::Success(PingResponse { msg: "pong" }).response()
+    /// }
+    /// ```
+    /// - Bad request
+    /// ```rust
+    /// #[get("/invalid")]
+    /// pub async fn test_invalid() -> AppResult<()> {
+    ///     AppResponse::Invalid("test invalid").response()
+    /// }
+    /// ```
+    /// - Internal server error
+    /// ```rust
+    /// #[get("/internal")]
+    /// pub async fn test_internal() -> AppResult<()> {
+    ///     AppResponse::InternalError("some severe error").response()
+    /// }
+    /// ````
     pub fn response(self) -> Result<web::Json<OkModel<T>>, AppError> {
         match self {
             Self::Success(data) => Ok(web::Json(OkModel {

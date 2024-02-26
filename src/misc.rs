@@ -21,7 +21,7 @@ pub async fn ping() -> AppResult<PingResponse> {
     AppResponse::Success(PingResponse { msg: "pong" }).response()
 }
 
-/// defining an app
+/// Defining an app
 pub struct TestApp;
 
 impl TestApp {
